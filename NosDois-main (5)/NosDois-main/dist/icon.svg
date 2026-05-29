@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient Matching the App's Theme -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2b0b5a" />
+      <stop offset="50%" stop-color="#17042a" />
+      <stop offset="100%" stop-color="#440733" />
+    </linearGradient>
+    
+    <!-- Heart Glow and Colors -->
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f43d99" />
+      <stop offset="100%" stop-color="#9c40f5" />
+    </linearGradient>
+    
+    <!-- Drop Shadow for House -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Luxurious Rounded Squircle Background -->
+  <rect x="16" y="16" width="480" height="480" rx="115" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.08)" stroke-width="4" />
+
+  <!-- House Body with shadow to feel 3D and rich -->
+  <g filter="url(#shadow)">
+    <!-- Roof triangles and chimney -->
+    <path d="M 120 280 L 256 160 L 392 280 L 360 280 L 360 380 C 360 391 351 400 340 400 L 172 400 C 161 400 152 391 152 380 L 152 280 Z" fill="#ffffff" />
+    
+    <!-- Doorway -->
+    <rect x="226" y="300" width="60" height="100" rx="10" fill="url(#bgGrad)" />
+  </g>
+
+  <!-- Glowing Heart overlapping the peak/roof -->
+  <g filter="url(#shadow)" transform="translate(10, -5)">
+    <path d="M 256 195 C 256 195 235 155 205 155 C 180 155 165 175 165 198 C 165 232 215 270 256 295 C 297 270 347 232 347 198 C 347 175 332 155 307 155 C 277 155 256 195 256 195 Z" fill="url(#heartGrad)" />
+  </g>
+</svg>

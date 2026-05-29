@@ -1,0 +1,672 @@
+{
+  "users": {
+    "Leandro": {
+      "id": "Leandro",
+      "name": "Leandro",
+      "partner_nickname": "Mozão",
+      "color": "#3B82F6",
+      "timezone": "America/Sao_Paulo",
+      "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      "points_weekly": 40
+    },
+    "Kaisa": {
+      "id": "Kaisa",
+      "name": "Kaisa",
+      "partner_nickname": "Meu Amor",
+      "color": "#EC4899",
+      "timezone": "America/Sao_Paulo",
+      "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
+      "points_weekly": 55
+    }
+  },
+  "couple": {
+    "id": "couple_1",
+    "invite_code": "AMOR42",
+    "connected": true,
+    "home_level": 4,
+    "total_points": 380,
+    "unlocked_achievements": [
+      "7-days-no-dishes",
+      "first-trip-album",
+      "activity:mood:✨ Sintonia do Amor: Leandro atualizou o humor para 'Ótimo': \"Registrado rápido da tela inicial\":2026-05-29T18:09:05.553Z"
+    ]
+  },
+  "couples": {
+    "couple_1": {
+      "id": "couple_1",
+      "invite_code": "AMOR42",
+      "connected": true,
+      "home_level": 4,
+      "total_points": 380,
+      "unlocked_achievements": [
+        "7-days-no-dishes",
+        "first-trip-album",
+        "activity:mood:✨ Sintonia do Amor: Leandro atualizou o humor para 'Ótimo': \"Registrado rápido da tela inicial\":2026-05-29T18:09:05.553Z"
+      ]
+    },
+    "couple_1780078127524_906": {
+      "id": "couple_1780078127524_906",
+      "invite_code": "CASAL16",
+      "connected": false,
+      "home_level": 1,
+      "total_points": 0,
+      "unlocked_achievements": [
+        "activity:register:🏠 Lar digital iniciado por Leandra !:2026-05-29T18:08:47.525Z"
+      ]
+    }
+  },
+  "couplesUsers": {
+    "couple_1": {
+      "Leandro": {
+        "id": "Leandro",
+        "name": "Leandro",
+        "partner_nickname": "Mozão",
+        "color": "#3B82F6",
+        "timezone": "America/Sao_Paulo",
+        "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+        "points_weekly": 40
+      },
+      "Kaisa": {
+        "id": "Kaisa",
+        "name": "Kaisa",
+        "partner_nickname": "Meu Amor",
+        "color": "#EC4899",
+        "timezone": "America/Sao_Paulo",
+        "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
+        "points_weekly": 55
+      }
+    },
+    "couple_1780078127524_906": {
+      "Leandro": {
+        "id": "Leandro",
+        "name": "Leandra ",
+        "partner_nickname": "Meu Amor",
+        "color": "#3B82F6",
+        "timezone": "America/Sao_Paulo",
+        "avatar_url": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150",
+        "points_weekly": 0
+      },
+      "Kaisa": {
+        "id": "Kaisa",
+        "name": "Parceiro 2",
+        "partner_nickname": "Minha Vida",
+        "color": "#EC4899",
+        "timezone": "America/Sao_Paulo",
+        "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
+        "points_weekly": 0
+      }
+    }
+  },
+  "accounts": [
+    {
+      "email": "leandro@nosdois.com",
+      "passwordHash": "123456",
+      "userId": "Leandro",
+      "coupleId": "couple_1"
+    },
+    {
+      "email": "kaisa@nosdois.com",
+      "passwordHash": "123456",
+      "userId": "Kaisa",
+      "coupleId": "couple_1"
+    },
+    {
+      "email": "leehvitoria2002@gmail.com",
+      "passwordHash": "Lean@3698",
+      "userId": "Leandro",
+      "coupleId": "couple_1780078127524_906"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_1",
+      "title": "Lavar a louça do jantar",
+      "description": "Lavar pratos, panelas e limpar a pia para manter a cozinha cheirosa.",
+      "responsible_id": "Leandro",
+      "category": "Cozinha",
+      "priority": "Normal",
+      "due_date": "2026-05-29",
+      "recurrence": "Diária",
+      "time_estimate": 20,
+      "points": 10,
+      "completed": false,
+      "archived": false,
+      "comments": [
+        {
+          "id": "c1",
+          "author_id": "Kaisa",
+          "text": "Amor, não se esquece de colocar o escorredor no lugar 💜",
+          "timestamp": "2026-05-29T17:02:25.615Z"
+        },
+        {
+          "id": "c2",
+          "author_id": "Leandro",
+          "text": "Pode deixar, vou fazer isso já já!",
+          "timestamp": "2026-05-29T17:32:25.615Z"
+        }
+      ]
+    },
+    {
+      "id": "task_2",
+      "title": "Dar banho no Luke (Pet)",
+      "description": "Dar banho, secar bem com toalha e aplicar o spray de cheiro agradável.",
+      "responsible_id": "Kaisa",
+      "category": "Pet",
+      "priority": "Urgente",
+      "due_date": "2026-05-29",
+      "recurrence": "Semanal",
+      "time_estimate": 45,
+      "points": 25,
+      "completed": true,
+      "completed_at": "2026-05-28T18:02:25.615Z",
+      "archived": false,
+      "comments": [
+        {
+          "id": "c3",
+          "author_id": "Kaisa",
+          "text": "Ficou muito cheiroso!",
+          "timestamp": "2026-05-28T19:49:05.615Z"
+        }
+      ]
+    },
+    {
+      "id": "task_3",
+      "title": "Passar pano na sala e quarto",
+      "description": "Varrer primeiro, depois passar pano úmido com desinfetante lavanda.",
+      "responsible_id": "Ambos",
+      "category": "Sala",
+      "priority": "Normal",
+      "due_date": "2026-05-30",
+      "recurrence": "Semanal",
+      "time_estimate": 30,
+      "points": 15,
+      "completed": false,
+      "archived": false,
+      "comments": []
+    },
+    {
+      "id": "task_4",
+      "title": "Trocar lâmpada do banheiro social",
+      "description": "Comprar lâmpada LED branca de rosca comum e instalar.",
+      "responsible_id": "Leandro",
+      "category": "Banheiro",
+      "priority": "Baixa",
+      "due_date": "2026-06-01",
+      "recurrence": "Nenhuma",
+      "time_estimate": 10,
+      "points": 10,
+      "completed": false,
+      "archived": false,
+      "comments": []
+    }
+  ],
+  "events": [
+    {
+      "id": "event_1",
+      "title": "Aniversário de Casamento (Celebração)",
+      "description": "Nosso dia especial! Jantar romântico reservado no restaurante Vista Rooftop.",
+      "type": "Data especial",
+      "start_time": "2026-06-12T20:00:00",
+      "end_time": "2026-06-12T23:30:00",
+      "location": "Restaurante Vista Rooftop",
+      "booking_link": "https://example.com/reserva-vista",
+      "responsible_id": "Ambos",
+      "comments": []
+    },
+    {
+      "id": "event_2",
+      "title": "Viagem de Fim de Semana para Campos do Jordão",
+      "description": "Mini-férias no frio! Cobertores, fondue e caminhadas ao ar livre.",
+      "type": "Viagem",
+      "start_time": "2026-07-15T08:00:00",
+      "end_time": "2026-07-17T18:00:00",
+      "location": "Chale Bosque Feliz, Campos do Jordão",
+      "travel_checklist": [
+        {
+          "item": "Casacos pesados",
+          "checked": true
+        },
+        {
+          "item": "Estojo de remédios",
+          "checked": false
+        },
+        {
+          "item": "Garrafa térmica de café",
+          "checked": true
+        },
+        {
+          "item": "Carregadores e câmera",
+          "checked": false
+        }
+      ],
+      "responsible_id": "Ambos",
+      "comments": [
+        {
+          "id": "ec1",
+          "author_id": "Leandro",
+          "text": "Já abasteci o carro!",
+          "timestamp": "2026-05-29T18:02:25.615Z"
+        }
+      ]
+    },
+    {
+      "id": "event_3",
+      "title": "Consulta Médica da Kaisa",
+      "description": "Exames de rotina periódicos.",
+      "type": "Evento individual",
+      "start_time": "2026-06-05T14:30:00",
+      "responsible_id": "Kaisa",
+      "comments": []
+    }
+  ],
+  "shopping": [
+    {
+      "id": "shop_1",
+      "name": "Tomate italiano",
+      "category": "Hortifrúti",
+      "quantity": 1,
+      "unit": "kg",
+      "price": 8.5,
+      "is_bought": false,
+      "added_by": "Kaisa"
+    },
+    {
+      "id": "shop_2",
+      "name": "Leite Integral Sem Lactose",
+      "category": "Laticínios",
+      "quantity": 4,
+      "unit": "caixas",
+      "price": 5.2,
+      "is_bought": false,
+      "added_by": "Leandro"
+    },
+    {
+      "id": "shop_3",
+      "name": "Alcatra bovina",
+      "category": "Carnes",
+      "quantity": 1.2,
+      "unit": "kg",
+      "price": 42,
+      "is_bought": true,
+      "bought_at": "2026-05-29T17:55:45.615Z",
+      "added_by": "Leandro"
+    },
+    {
+      "id": "shop_4",
+      "name": "Detergente de Maçã",
+      "category": "Limpeza",
+      "quantity": 2,
+      "unit": "unidades",
+      "price": 2.8,
+      "is_bought": false,
+      "added_by": "Kaisa"
+    },
+    {
+      "id": "shop_5",
+      "name": "Papel higiênico folha dupla",
+      "category": "Higiene",
+      "quantity": 1,
+      "unit": "pacote (12 un)",
+      "price": 18.9,
+      "is_bought": false,
+      "added_by": "Kaisa"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "exp_1",
+      "value": 350,
+      "currency": "R$",
+      "description": "Supermercado Semanal (Pão de Açúcar)",
+      "paid_by_id": "Leandro",
+      "split_type": "50/50",
+      "category": "Alimentação",
+      "date": "2026-05-29",
+      "is_recurring": false
+    },
+    {
+      "id": "exp_2",
+      "value": 1200,
+      "currency": "R$",
+      "description": "Aluguel & Condomínio",
+      "paid_by_id": "Kaisa",
+      "split_type": "50/50",
+      "category": "Moradia",
+      "date": "2026-05-25",
+      "is_recurring": true
+    },
+    {
+      "id": "exp_3",
+      "value": 85,
+      "currency": "R$",
+      "description": "Remédios Higiene Pet Shop (Luke)",
+      "paid_by_id": "Kaisa",
+      "split_type": "custom",
+      "custom_percent": 60,
+      "category": "Pets",
+      "date": "2026-05-27",
+      "is_recurring": false
+    },
+    {
+      "id": "exp_4",
+      "value": 160,
+      "currency": "R$",
+      "description": "Cinema e Pipoca (Divertidamente)",
+      "paid_by_id": "Leandro",
+      "split_type": "paid_all",
+      "category": "Lazer",
+      "date": "2026-05-24",
+      "is_recurring": false
+    }
+  ],
+  "memories": [
+    {
+      "id": "mem_1",
+      "url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=600",
+      "description": "Nossos sorrisos congelados na primeira que fomos à praia juntos!",
+      "date": "2025-01-10",
+      "location": "Ubatuba, SP",
+      "album_name": "Praia e Verão",
+      "created_at": "2025-05-29T18:02:25.615Z"
+    },
+    {
+      "id": "mem_2",
+      "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=600",
+      "description": "O dia que pegamos as chaves do nosso cantinho. Choro e emoção!",
+      "date": "2026-03-15",
+      "location": "São Paulo, SP",
+      "album_name": "Nosso Apartamento",
+      "created_at": "2026-03-30T18:02:25.615Z"
+    },
+    {
+      "id": "mem_3",
+      "url": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=600",
+      "description": "Luke dormindo com a língua pra fora, não aguentamos e tivemos que tirar foto.",
+      "date": "2026-05-29",
+      "location": "Em casa",
+      "album_name": "Adorável Luke",
+      "created_at": "2026-05-29T18:02:25.615Z"
+    }
+  ],
+  "moods": [
+    {
+      "id": "mood_1",
+      "user_id": "Leandro",
+      "mood": "Ótimo",
+      "note": "Registrado rápido da tela inicial",
+      "share_note": true,
+      "date": "2026-05-29"
+    },
+    {
+      "id": "mood_2",
+      "user_id": "Kaisa",
+      "mood": "Bem",
+      "note": "Rotina corrida mas tudo sob controle",
+      "share_note": false,
+      "date": "2026-05-29"
+    },
+    {
+      "id": "mood_prev_1",
+      "user_id": "Leandro",
+      "mood": "Bem",
+      "date": "2026-05-28",
+      "share_note": false
+    },
+    {
+      "id": "mood_prev_2",
+      "user_id": "Kaisa",
+      "mood": "Cansado",
+      "note": "Faculdade cansativa demais",
+      "date": "2026-05-28",
+      "share_note": true
+    },
+    {
+      "id": "mood_prev_3",
+      "user_id": "Leandro",
+      "mood": "Ansioso",
+      "date": "2026-05-27",
+      "share_note": false
+    },
+    {
+      "id": "mood_prev_4",
+      "user_id": "Kaisa",
+      "mood": "Ótimo",
+      "date": "2026-05-27",
+      "share_note": false
+    }
+  ],
+  "wishlist": [
+    {
+      "id": "wish_1",
+      "name": "Smart TV 4K 55 Polegadas",
+      "priority": "Alta",
+      "category": "Para o Lar",
+      "link": "https://example.com/tv",
+      "estimated_price": 2500,
+      "added_by": "Kaisa",
+      "saving_goal": 2500,
+      "saving_saved": 1200
+    },
+    {
+      "id": "wish_2",
+      "name": "Anel de Prata Minimalista",
+      "priority": "Média",
+      "category": "Pessoal",
+      "link": "https://example.com/ring",
+      "estimated_price": 180,
+      "is_private_to_partner": true,
+      "added_by": "Leandro"
+    },
+    {
+      "id": "wish_3",
+      "name": "Máquina de Café Espresso Exclusiva",
+      "priority": "Média",
+      "category": "Para o Lar",
+      "estimated_price": 950,
+      "added_by": "Leandro",
+      "saving_goal": 950,
+      "saving_saved": 300
+    },
+    {
+      "id": "wish_4",
+      "name": "Passagem de balão em Boituva",
+      "priority": "Alta",
+      "category": "Experiências",
+      "estimated_price": 800,
+      "added_by": "Ambos",
+      "saving_goal": 800,
+      "saving_saved": 800
+    }
+  ],
+  "recipes": [
+    {
+      "id": "rec_1",
+      "title": "Macarrão Cremoso de Manjericão",
+      "ingredients": [
+        "Macarrão Penne - 300g",
+        "Molho de tomate - 1 lata",
+        "Manjericão fresco - 1 punhado",
+        "Creme de leite - 1 caixinha",
+        "Alho amassado - 2 dentes",
+        "Azeite de oliva"
+      ],
+      "instructions": "1. Cozinhe o penne em água salgada até ficar al dente.\n2. Refogue o alho no azeite, adicione o molho de tomate e manjericão, cozinhe por 5 min.\n3. Misture o creme de leite no molho em fogo baixo.\n4. Escorra a massa e envolva-a completamente no creme aromático. Sirva quente com queijo ralado.",
+      "duration": 20,
+      "portions": 2,
+      "couple_rating": "Favorita",
+      "tags": [
+        "rápida",
+        "econômica",
+        "vegetariana"
+      ]
+    },
+    {
+      "id": "rec_2",
+      "title": "Escondidinho de Carne Seca",
+      "ingredients": [
+        "Mandioca cozida - 1kg",
+        "Carne seca desfiada dessalgada - 500g",
+        "Cebola picada - 1 un",
+        "Manteiga - 2 colheres",
+        "Leite integral - 1 xícara",
+        "Queijo coalho ralado - 150g"
+      ],
+      "instructions": "1. Amasse a mandioca quente com manteiga e leite até virar um purê homogêneo.\n2. Refogue a carne seca com cebola até dourar.\n3. Num refratário, faça uma camada de carne, cubra com o purê de mandioca e polvilhe o queijo coalho.\n4. Leve ao forno para gratinar por 20 minutos a 200°C.",
+      "duration": 50,
+      "portions": 3,
+      "couple_rating": "Gostamos",
+      "tags": [
+        "especial"
+      ]
+    }
+  ],
+  "mealPlan": [
+    {
+      "id": "Segunda-Café",
+      "day": "Segunda",
+      "meal_type": "Café",
+      "custom_text": "Mamão, ovos mexidos e café puro"
+    },
+    {
+      "id": "Segunda-Almoço",
+      "day": "Segunda",
+      "meal_type": "Almoço",
+      "recipe_id": "rec_1"
+    },
+    {
+      "id": "Segunda-Jantar",
+      "day": "Segunda",
+      "meal_type": "Jantar",
+      "custom_text": "Sopa leve de legumes e torrada"
+    },
+    {
+      "id": "Quarta-Jantar",
+      "day": "Quarta",
+      "meal_type": "Jantar",
+      "recipe_id": "rec_2"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inv_1",
+      "name": "Arroz agulhinha",
+      "quantity": 2,
+      "unit": "kg",
+      "min_quantity": 1
+    },
+    {
+      "id": "inv_2",
+      "name": "Café Gourmet moído",
+      "quantity": 0.5,
+      "unit": "kg",
+      "min_quantity": 0.5
+    },
+    {
+      "id": "inv_3",
+      "name": "Açúcar demerara",
+      "quantity": 0.2,
+      "unit": "kg",
+      "min_quantity": 0.5
+    },
+    {
+      "id": "inv_4",
+      "name": "Sabonete líquido corpo",
+      "quantity": 1,
+      "unit": "unidade",
+      "min_quantity": 2
+    },
+    {
+      "id": "inv_5",
+      "name": "Detergente de Maçã",
+      "quantity": 1,
+      "unit": "unidade",
+      "min_quantity": 1
+    }
+  ],
+  "rewards": [
+    {
+      "id": "feet_massage",
+      "title": "Massagem nos Pés de 30min",
+      "cost": 65,
+      "desc": "Mozão massageia seus pés após um dia tenso de rotina.",
+      "emoji": "💆‍♂️"
+    },
+    {
+      "id": "breakfast_bed",
+      "title": "Café da Manhã na Cama",
+      "cost": 95,
+      "desc": "Servido com torrada, café quentinho e beijinhos de bom dia.",
+      "emoji": "☕"
+    },
+    {
+      "id": "movie_choice",
+      "title": "Escolha Soberana do Filme",
+      "cost": 35,
+      "desc": "Decide o filme de hoje sem receber reclamações do parceiro.",
+      "emoji": "🎬"
+    },
+    {
+      "id": "no_dishes",
+      "title": "Folga da Louça por 1 Dia",
+      "cost": 50,
+      "desc": "Isenção integral de lavar louça de qualquer refeição do dia.",
+      "emoji": "🧼"
+    },
+    {
+      "id": "dream_dessert",
+      "title": "Sobremesa Especial do Amor",
+      "cost": 75,
+      "desc": "Mozão prepara ou compra o doce ou bolo que você pedir.",
+      "emoji": "🍰"
+    },
+    {
+      "id": "full_massage",
+      "title": "Massageador nos Ombros & Costas",
+      "cost": 120,
+      "desc": "Sessão caprichada com óleos relaxantes e silêncio absoluto.",
+      "emoji": "🕯️"
+    }
+  ],
+  "quests": [
+    {
+      "id": "quest_1",
+      "title": "Guardiões da Faxina",
+      "description": "Concluir 3 tarefas de limpeza no painel.",
+      "points": 20,
+      "type": "Faxina",
+      "target_count": 3,
+      "current_count": 0,
+      "completed": false
+    },
+    {
+      "id": "quest_2",
+      "title": "Dupla Harmonia",
+      "description": "Ambos fazerem o check-in de humor de hoje.",
+      "points": 15,
+      "type": "Afeto",
+      "target_count": 2,
+      "current_count": 0,
+      "completed": false
+    },
+    {
+      "id": "quest_3",
+      "title": "Menu NósDois",
+      "description": "Registrar receitas especiais e favoritas.",
+      "points": 25,
+      "type": "Culinária",
+      "target_count": 1,
+      "current_count": 0,
+      "completed": false
+    }
+  ],
+  "quickNotes": [
+    {
+      "id": "note_1780078154136",
+      "text": "testando",
+      "authorId": "Leandro",
+      "createdAt": "2026-05-29T18:09:14.136Z",
+      "coupleId": "couple_1780078127524_906"
+    }
+  ],
+  "pets": []
+}

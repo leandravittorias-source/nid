@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Base custom styles to guarantee a pristine interface */
+body {
+  background-color: #f5f3ff; /* Soft purple-tint light tint */
+  color: #111827; /* Quase preto */
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease-in-out, border-color 0.25s ease-in-out;
+}
+
+/* Eye-safe dark & twilight theme using standard Tailwind v4 Custom Properties inheritance */
+body.dark, .dark {
+  background-color: #0d091a !important;
+  color: #f8fafc !important;
+
+  --color-white: #161127; /* Card background */
+  --color-slate-50: #0d091a; /* Body background */
+  --color-slate-100: #221a36; /* Muted borders and dividers */
+  --color-slate-200: #33274e; /* Visible border / hover state */
+  --color-slate-300: #4a3c6c;
+  --color-slate-400: #7b6ba1;
+  --color-slate-500: #9989bd; /* Labels and muted texts */
+  --color-slate-600: #b5adc9;
+  --color-slate-700: #d0c8e2;
+  --color-slate-850: #ebe7f5;
+  --color-slate-900: #fcfbfe; /* Headers and main contrast text */
+  --color-slate-950: #ffffff;
+}
+
+/* Fallback style overrides to force complete high-fidelity dark mode across the app */
+.dark .bg-white {
+  background-color: #161127 !important;
+}
+
+.dark .text-slate-900,
+.dark .text-gray-900 {
+  color: #fcfbfe !important;
+}
+
+.dark .text-slate-800,
+.dark .text-gray-800 {
+  color: #d0c8e2 !important;
+}
+
+.dark .text-slate-700,
+.dark .text-gray-700 {
+  color: #b5adc9 !important;
+}
+
+.dark .text-slate-600,
+.dark .text-gray-600 {
+  color: #9989bd !important;
+}
+
+.dark .text-slate-500,
+.dark .text-gray-500 {
+  color: #7b6ba1 !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-gray-50 {
+  background-color: #0d091a !important;
+}
+
+.dark .bg-slate-100,
+.dark .bg-gray-100 {
+  background-color: #221a36 !important;
+}
+
+.dark .border-slate-100,
+.dark .border-gray-100 {
+  border-color: #221a36 !important;
+}
+
+.dark .border-slate-200,
+.dark .border-gray-200 {
+  border-color: #33274e !important;
+}
+
+.dark input, 
+.dark select, 
+.dark textarea {
+  background-color: #221a36 !important;
+  color: #f8fafc !important;
+  border-color: #33274e !important;
+}
+
+.dark input::placeholder, 
+.dark textarea::placeholder {
+  color: #7b6ba1 !important;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: #3e3160;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #544383;
+}
+
+/* Custom gorgeous scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
