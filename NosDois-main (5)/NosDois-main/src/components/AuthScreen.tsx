@@ -43,6 +43,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showEmotionalAnimation, setShowEmotionalAnimation] = useState(false);
+  const [createdUserId, setCreatedUserId] = useState("Leandro");
 
   // Social Login Modals
   const [socialModalType, setSocialModalType] = useState<"google" | "apple" | null>(null);
@@ -97,6 +98,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
       setCreatedInviteCode(data.couple.invite_code);
       setCreatedCoupleId(data.coupleId);
+      setCreatedUserId(data.userId || "Leandro");
       setView('register-success');
     } catch (err: any) {
       setError(err.message);
@@ -188,7 +190,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
       // Play beautiful emotional transition animation!
       setShowEmotionalAnimation(true);
       setTimeout(() => {
-        onAuthSuccess("Kaisa", foundCoupleId, spouseEmail);
+        onAuthSuccess(data.userId || "Kaisa", foundCoupleId, spouseEmail);
       }, 3500);
 
     } catch (err: any) {
@@ -764,7 +766,7 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => onAuthSuccess("Leandro", createdCoupleId, regEmail)}
+                    onClick={() => onAuthSuccess(createdUserId, createdCoupleId, regEmail)}
                     className="w-full py-3 px-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl text-xs font-bold cursor-pointer transition flex items-center justify-center gap-1.5"
                   >
                     Entrar no Painel do Casal
@@ -957,6 +959,3 @@ export default function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
     </div>
   );
 }
-
-
-export default AuthScreen

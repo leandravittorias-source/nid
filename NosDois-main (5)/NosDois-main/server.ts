@@ -187,7 +187,11 @@ app.get("/api/state", (req, res) => {
   // Filter items owned by this coupleId
   const filterByCouple = (items: any[]) => {
     if (!items) return [];
-    return items.filter(item => (item.coupleId || "couple_1") === coupleId);
+    // Items without coupleId belong to couple_1 (legacy seed data)
+    return items.filter(item => {
+      const itemCoupleId = item.coupleId || "couple_1";
+      return itemCoupleId === coupleId;
+    });
   };
 
   res.json({
@@ -349,10 +353,6 @@ app.post("/api/auth/use-code", (req, res) => {
   }
 
   const couple = store.couples[coupleId];
-  if (couple.connected) {
-    return res.status(400).json({ error: "Código já foi utilizado e o casal já se deparou!" });
-  }
-
   const { users } = getCoupleAndUsers(store, coupleId);
 
   res.json({
@@ -380,8 +380,11 @@ app.post("/api/auth/complete-partner", (req, res) => {
 
   const { couple, users } = getCoupleAndUsers(store, coupleId);
 
-  if (couple.connected) {
-    return res.status(400).json({ error: "Casal já conectado para este código!" });
+  // If couple already connected, it means partner 2 already registered
+  // but we can still allow registering partner 2 if they don't have an account yet
+  const partnerAccount = store.accounts.find(a => a.coupleId === coupleId && a.userId === "Kaisa");
+  if (couple.connected && partnerAccount) {
+    return res.status(400).json({ error: "O parceiro já possui uma conta registrada. Use 'Entrar' com seu email e senha." });
   }
 
   // Register account for Partner 2
@@ -403,9 +406,8 @@ app.post("/api/auth/complete-partner", (req, res) => {
     points_weekly: 0
   };
 
-  // Mark connected, clear connection code
+  // Mark connected, keep invite code for reference
   couple.connected = true;
-  couple.invite_code = null;
 
   logActivityForCouple(store, coupleId, "couple_connected", `💜 ${name} entrou no lar compartilhado com ${users["Leandro"].name}!`);
 
@@ -533,37 +535,46 @@ app.post("/api/couple/reconnect", (req, res) => {
 });
 
 // Helper for keeping a synchronized real-time activity feed inside unlocked_achievements
-function logActivity(store: any, prefix: string, message: string) {
-  if (!store.couple.unlocked_achievements) {
-    store.couple.unlocked_achievements = [];
+// coupleId is optional; falls back to store.couple for backwards compat with couple_1
+function logActivity(store: any, prefix: string, message: string, coupleId?: string) {
+  let couple: any;
+  if (coupleId && store.couples && store.couples[coupleId]) {
+    couple = store.couples[coupleId];
+  } else {
+    couple = store.couple;
+  }
+  if (!couple) return;
+  if (!couple.unlocked_achievements) {
+    couple.unlocked_achievements = [];
   }
   const timestamp = new Date().toISOString();
-  store.couple.unlocked_achievements.push(`activity:${prefix}:${message}:${timestamp}`);
-  
+  couple.unlocked_achievements.push(`activity:${prefix}:${message}:${timestamp}`);
+
   // Keep last 40 activities to avoid array growing indefinitely
-  const nonActivities = store.couple.unlocked_achievements.filter((a: string) => !a.startsWith("activity:"));
-  const activities = store.couple.unlocked_achievements.filter((a: string) => a.startsWith("activity:"));
-  store.couple.unlocked_achievements = [...nonActivities, ...activities.slice(-40)];
+  const nonActivities = couple.unlocked_achievements.filter((a: string) => !a.startsWith("activity:"));
+  const activities = couple.unlocked_achievements.filter((a: string) => a.startsWith("activity:"));
+  couple.unlocked_achievements = [...nonActivities, ...activities.slice(-40)];
 }
 
 // Spend points to redeem a reward coupon
 app.post("/api/couple/redeem-reward", (req, res) => {
   const { reward_title, cost, user_id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
-  
-  if (store.couple.total_points >= cost) {
-    store.couple.total_points -= cost;
-    
-    // Log achievement / claim
-    if (!store.couple.unlocked_achievements) {
-      store.couple.unlocked_achievements = [];
+  const { couple } = getCoupleAndUsers(store, coupleId);
+
+  if (couple.total_points >= cost) {
+    couple.total_points -= cost;
+
+    if (!couple.unlocked_achievements) {
+      couple.unlocked_achievements = [];
     }
-    
+
     const timestampStr = new Date().toISOString();
-    store.couple.unlocked_achievements.push(`redeemed:${reward_title}:${user_id}:${timestampStr}`);
-    
+    couple.unlocked_achievements.push(`redeemed:${reward_title}:${user_id}:${timestampStr}`);
+
     db.saveStore();
-    res.json({ success: true, message: `Recompensa '${reward_title}' resgatada com sucesso por ${user_id}!`, state: db.getStore() });
+    res.json({ success: true, message: `Recompensa '${reward_title}' resgatada com sucesso por ${user_id}!` });
   } else {
     res.status(400).json({ error: "Pontos do lar insuficientes para este resgate carinhoso." });
   }
@@ -603,25 +614,26 @@ app.post("/api/tasks/create", (req, res) => {
 // Toggle Task Complete & Perform Gamification calculation
 app.post("/api/tasks/toggle", (req, res) => {
   const { id, user_id, photo_proof } = req.body; // user_id is the person completing it
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
+  const { couple, users } = getCoupleAndUsers(store, coupleId);
   const task = store.tasks.find(t => t.id === id);
-  
+
   if (!task) {
     return res.status(404).json({ error: "Task not found" });
   }
 
-  const wasCompleted = task.completed;
   task.completed = !task.completed;
-  
+
   if (task.completed) {
     task.completed_at = new Date().toISOString();
     if (photo_proof) {
       task.photo_proof = photo_proof;
     }
-    
+
     // Gamification Points
     let earnedPoints = task.priority === TaskPriority.URGENTE ? 25 : 10;
-    
+
     // Check if on-time deadline bonus (due_date exists and completed before or on that date)
     if (task.due_date) {
       const todayStr = new Date().toISOString().split("T")[0];
@@ -629,14 +641,14 @@ app.post("/api/tasks/toggle", (req, res) => {
         earnedPoints += 5; // +5 on-time completion bonus!
       }
     }
-    
+
     // Allocate to the user who completed and the couple's total
-    if (store.users[user_id]) {
-      store.users[user_id].points_weekly += earnedPoints;
+    if (users[user_id]) {
+      users[user_id].points_weekly += earnedPoints;
     }
-    store.couple.total_points += earnedPoints;
-    
-    logActivity(store, "task_completed", `${user_id} completou a tarefa '${task.title}' (+${earnedPoints} pontos!)`);
+    couple.total_points += earnedPoints;
+
+    logActivity(store, "task_completed", `${user_id} completou a tarefa '${task.title}' (+${earnedPoints} pontos!)`, coupleId);
 
     // Recorrência automática de tarefas (automatic reproduction of completed recurring tasks)
     if (task.recurrence && task.recurrence !== "Nenhuma") {
@@ -655,7 +667,7 @@ app.post("/api/tasks/toggle", (req, res) => {
         nextDate.setMonth(nextDate.getMonth() + 1);
       }
       const nextDueDateStr = nextDate.toISOString().split("T")[0];
-      
+
       const recurringTask: any = {
         id: "task_rec_" + Date.now(),
         title: task.title,
@@ -673,14 +685,14 @@ app.post("/api/tasks/toggle", (req, res) => {
         coupleId: (task as any).coupleId
       };
       store.tasks.push(recurringTask);
-      logActivity(store, "task_recreated", `Agenda recorrente agendada para ${nextDueDateStr}: ${task.title}`);
+      logActivity(store, "task_recreated", `Agenda recorrente agendada para ${nextDueDateStr}: ${task.title}`, coupleId);
     }
 
     // Check if new Home Level reached (progress 100 points per level)
-    const nextLevel = Math.floor(store.couple.total_points / 100) + 1;
-    if (nextLevel > store.couple.home_level) {
-      store.couple.home_level = nextLevel;
-      logActivity(store, "level_up", `🎉 Parabéns! O lar subiu para o Nível ${nextLevel} com ${store.couple.total_points} pontos!`);
+    const nextLevel = Math.floor(couple.total_points / 100) + 1;
+    if (nextLevel > couple.home_level) {
+      couple.home_level = nextLevel;
+      logActivity(store, "level_up", `🎉 Parabéns! O lar subiu para o Nível ${nextLevel} com ${couple.total_points} pontos!`, coupleId);
     }
   } else {
     // Deduct when uncompleting (within 24h error margin)
@@ -689,17 +701,17 @@ app.post("/api/tasks/toggle", (req, res) => {
       // assume it was on time
       penaltyPoints += 5;
     }
-    if (store.users[user_id]) {
-      store.users[user_id].points_weekly = Math.max(0, store.users[user_id].points_weekly - penaltyPoints);
+    if (users[user_id]) {
+      users[user_id].points_weekly = Math.max(0, users[user_id].points_weekly - penaltyPoints);
     }
-    store.couple.total_points = Math.max(0, store.couple.total_points - penaltyPoints);
+    couple.total_points = Math.max(0, couple.total_points - penaltyPoints);
     task.completed_at = undefined;
     task.photo_proof = undefined;
-    logActivity(store, "task_undone", `${user_id} reabriu a tarefa '${task.title}'.`);
+    logActivity(store, "task_undone", `${user_id} reabriu a tarefa '${task.title}'.`, coupleId);
   }
 
   db.saveStore();
-  res.json({ success: true, task, couple: store.couple, users: store.users });
+  res.json({ success: true, task, couple, users });
 });
 
 // Soft Delete / Archive
@@ -878,6 +890,7 @@ app.post("/api/shopping/create-bulk", (req, res) => {
 // Toggle Bought - simple checkoff (removed automatic inventory sync or complicated automatic additions)
 app.post("/api/shopping/toggle", (req, res) => {
   const { id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   const item = store.shopping.find(i => i.id === id);
   if (!item) {
@@ -888,9 +901,9 @@ app.post("/api/shopping/toggle", (req, res) => {
   item.bought_at = item.is_bought ? new Date().toISOString() : undefined;
 
   if (item.is_bought) {
-    logActivity(store, "shopping", `🛒 Compra Selecionada: '${item.name}' (${item.quantity} ${item.unit}) foi riscado.`);
+    logActivity(store, "shopping", `🛒 Compra Selecionada: '${item.name}' (${item.quantity} ${item.unit}) foi riscado.`, coupleId);
   } else {
-    logActivity(store, "shopping_removed", `🛒 Compra Desmarcada: '${item.name}' está pendente.`);
+    logActivity(store, "shopping_removed", `🛒 Compra Desmarcada: '${item.name}' está pendente.`, coupleId);
   }
 
   db.saveStore();
@@ -912,13 +925,15 @@ app.post("/api/shopping/budget", (req, res) => {
   if (!monthId) {
     return res.status(400).json({ error: "monthId is required" });
   }
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
-  if (!store.couple.shoppingBudgets) {
-    store.couple.shoppingBudgets = {};
+  const { couple } = getCoupleAndUsers(store, coupleId);
+  if (!couple.shoppingBudgets) {
+    couple.shoppingBudgets = {};
   }
-  store.couple.shoppingBudgets[monthId] = parseFloat(budget) || 0;
+  couple.shoppingBudgets[monthId] = parseFloat(budget) || 0;
   db.saveStore();
-  res.json({ success: true, shoppingBudgets: store.couple.shoppingBudgets });
+  res.json({ success: true, shoppingBudgets: couple.shoppingBudgets });
 });
 
 // Update single item fields inline in real-time
@@ -951,7 +966,9 @@ app.post("/api/shopping/finalize", (req, res) => {
     return res.status(400).json({ error: "monthId is required" });
   }
 
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
+  const { couple } = getCoupleAndUsers(store, coupleId);
   
   // Find all items for this month (handling defaults)
   const currentMonthId = monthId;
@@ -985,11 +1002,11 @@ app.post("/api/shopping/finalize", (req, res) => {
   const difference = estimatedTotal - actualSpent;
 
   // Store detailed finalization record in a custom array on couple
-  if (!store.couple.shoppingFinalizations) {
-    (store.couple as any).shoppingFinalizations = [];
+  if (!couple.shoppingFinalizations) {
+    (couple as any).shoppingFinalizations = [];
   }
-  
-  (store.couple as any).shoppingFinalizations.push({
+
+  (couple as any).shoppingFinalizations.push({
     id: "fin_" + Date.now(),
     monthId: currentMonthId,
     estimatedTotal,
@@ -1056,11 +1073,12 @@ app.post("/api/shopping/finalize", (req, res) => {
   logActivity(
     store,
     "shopping_finalized",
-    `✅ Lista de ${readableMonth} finalizada por ${paid_by_id}! R$ ${actualSpent.toLocaleString("pt-BR", {minimumFractionDigits: 2})} pagos via ${paymentMethod || "Não Informado"} lançados automaticamente nas finanças.`
+    `✅ Lista de ${readableMonth} finalizada por ${paid_by_id}! R$ ${actualSpent.toLocaleString("pt-BR", {minimumFractionDigits: 2})} pagos via ${paymentMethod || "Não Informado"} lançados automaticamente nas finanças.`,
+    coupleId
   );
 
   db.saveStore();
-  res.json({ success: true, expenses: store.expenses, shopping: store.shopping, shoppingFinalizations: (store.couple as any).shoppingFinalizations });
+  res.json({ success: true, expenses: store.expenses, shopping: store.shopping, shoppingFinalizations: (couple as any).shoppingFinalizations });
 });
 
 // ================= HOUSE INVENTORY MODULE =================
@@ -1068,16 +1086,17 @@ app.post("/api/shopping/finalize", (req, res) => {
 // Add or edit stock manually (removed auto check-off triggers)
 app.post("/api/inventory/update", (req, res) => {
   const { id, name, quantity, min_quantity, unit } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
-  
+
   const checkAndAddToShopping = (item: any) => {
     if (item.quantity < item.min_quantity) {
       const today = new Date();
       const currentMonthId = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
       const lowercaseName = item.name.trim().toLowerCase();
       const exists = store.shopping.find(
-        (s: any) => !s.is_bought && 
-             (s.monthId === currentMonthId) && 
+        (s: any) => !s.is_bought &&
+             (s.monthId === currentMonthId) &&
              s.name.trim().toLowerCase() === lowercaseName
       );
       if (!exists) {
@@ -1094,7 +1113,7 @@ app.post("/api/inventory/update", (req, res) => {
           coupleId: item.coupleId
         };
         store.shopping.push(newShopItem as any);
-        logActivity(store, "inventory_low", `Estoque baixo: '${item.name}' caiu para ${item.quantity} ${item.unit}. Item inserido no carrinho! 🛒`);
+        logActivity(store, "inventory_low", `Estoque baixo: '${item.name}' caiu para ${item.quantity} ${item.unit}. Item inserido no carrinho! 🛒`, coupleId);
       }
     }
   };
@@ -1131,28 +1150,29 @@ app.post("/api/inventory/update", (req, res) => {
 
 app.post("/api/quick-notes/create", (req, res) => {
   const { text, authorId } = req.body;
-  
+
   if (!text || !authorId) {
     return res.status(400).json({ error: "Required fields missing" });
   }
-  
+
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.quickNotes) {
     store.quickNotes = [];
   }
-  
+
   const newNote = {
     id: "note_" + Date.now(),
     text,
     authorId,
     createdAt: new Date().toISOString()
   };
-  
+
   store.quickNotes.push(newNote);
   db.saveStore();
-  
-  logActivity(store, "note", `📝 ${authorId} adicionou nota rápida: "${text}"`);
-  
+
+  logActivity(store, "note", `📝 ${authorId} adicionou nota rápida: "${text}"`, coupleId);
+
   res.json({ success: true, note: newNote, quickNotes: store.quickNotes });
 });
 
@@ -1307,28 +1327,30 @@ app.post("/api/quests/delete", (req, res) => {
 
 app.post("/api/quests/toggle-complete", (req, res) => {
   const { id, user_id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
+  const { couple, users } = getCoupleAndUsers(store, coupleId);
   if (!store.quests) store.quests = [];
   const quest = store.quests.find(q => q.id === id);
   if (!quest) {
     return res.status(404).json({ error: "Quest not found" });
   }
-  
+
   quest.completed = !quest.completed;
   if (quest.completed) {
-    store.couple.total_points += quest.points;
-    if (user_id && store.users[user_id]) {
-      store.users[user_id].points_weekly += quest.points;
+    couple.total_points += quest.points;
+    if (user_id && users[user_id]) {
+      users[user_id].points_weekly += quest.points;
     }
   } else {
-    store.couple.total_points = Math.max(0, store.couple.total_points - quest.points);
-    if (user_id && store.users[user_id]) {
-      store.users[user_id].points_weekly = Math.max(0, store.users[user_id].points_weekly - quest.points);
+    couple.total_points = Math.max(0, couple.total_points - quest.points);
+    if (user_id && users[user_id]) {
+      users[user_id].points_weekly = Math.max(0, users[user_id].points_weekly - quest.points);
     }
   }
 
   db.saveStore();
-  res.json({ success: true, quest, couple: store.couple, users: store.users });
+  res.json({ success: true, quest, couple, users });
 });
 
 // ================= CALENDÁRIO DO CASAL =================
@@ -1432,12 +1454,13 @@ app.post("/api/moods/checkin", (req, res) => {
     return res.status(400).json({ error: "User ID and mood are required" });
   }
 
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   const todayStr = new Date().toISOString().split("T")[0];
-  
+
   // Find today's checkin for this user to update or append
-  let checkin = store.moods.find(m => m.user_id === user_id && m.date === todayStr);
-  
+  let checkin = store.moods.find(m => m.user_id === user_id && m.date === todayStr && (m as any).coupleId === coupleId);
+
   if (checkin) {
     checkin.mood = mood;
     checkin.note = note || "";
@@ -1454,7 +1477,7 @@ app.post("/api/moods/checkin", (req, res) => {
     store.moods.push(checkin);
   }
 
-  logActivity(store, "mood", `✨ Sintonia do Amor: ${user_id} atualizou o humor para '${mood}'${note ? `: "${note}"` : ""}`);
+  logActivity(store, "mood", `✨ Sintonia do Amor: ${user_id} atualizou o humor para '${mood}'${note ? `: "${note}"` : ""}`, coupleId);
 
   db.saveStore();
   res.json({ success: true, checkin });
@@ -1884,6 +1907,7 @@ app.post("/api/pets/create", (req, res) => {
     return res.status(400).json({ error: "Pet name is required" });
   }
 
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.pets) store.pets = [];
 
@@ -1903,13 +1927,14 @@ app.post("/api/pets/create", (req, res) => {
   };
 
   store.pets.push(newPet);
-  logActivity(store, "pet_added", `Novo pet registrado no lar: ${name}! 🐾`);
+  logActivity(store, "pet_added", `Novo pet registrado no lar: ${name}! 🐾`, coupleId);
   db.saveStore();
   res.json({ success: true, pet: newPet });
 });
 
 app.post("/api/pets/update", (req, res) => {
   const { id, name, species, breed, age, avatar_url, vaccines, medications, weights, documents, food_daily_qty, food_inventory_item_id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.pets) store.pets = [];
 
@@ -1959,7 +1984,7 @@ app.post("/api/pets/update", (req, res) => {
           coupleId: pet.coupleId
         };
         store.shopping.push(newShopItem as any);
-        logActivity(store, "pet_food_low", `Ração de '${pet.name}' acabando (${invItem.quantity} ${invItem.unit}). Item adicionado às compras!`);
+        logActivity(store, "pet_food_low", `Ração de '${pet.name}' acabando (${invItem.quantity} ${invItem.unit}). Item adicionado às compras!`, coupleId);
       }
     }
   }
@@ -1970,13 +1995,14 @@ app.post("/api/pets/update", (req, res) => {
 
 app.post("/api/pets/delete", (req, res) => {
   const { id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.pets) store.pets = [];
-  
+
   const pet = store.pets.find(p => p.id === id);
   if (pet) {
     store.pets = store.pets.filter(p => p.id !== id);
-    logActivity(store, "pet_deleted", `Pet removido do lar: ${pet.name}`);
+    logActivity(store, "pet_deleted", `Pet removido do lar: ${pet.name}`, coupleId);
     db.saveStore();
     res.json({ success: true });
   } else {
@@ -2025,7 +2051,7 @@ app.post("/api/tasks/transfer", (req, res) => {
     });
   }
 
-  logActivity(store, "task_transferred", `${userId} transferiu tarefa "${task.title}" para ${to_user_id}`);
+  logActivity(store, "task_transferred", `${userId} transferiu tarefa "${task.title}" para ${to_user_id}`, coupleId);
   db.saveStore();
   res.json({ success: true, task });
 });
@@ -2038,6 +2064,7 @@ app.post("/api/fixed-functions/create", (req, res) => {
     return res.status(400).json({ error: "Title, responsible and frequency are required" });
   }
 
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.fixedFunctions) store.fixedFunctions = [];
 
@@ -2054,13 +2081,14 @@ app.post("/api/fixed-functions/create", (req, res) => {
   };
 
   store.fixedFunctions.push(newFunction);
-  logActivity(store, "function_created", `Nova rotina fixa: ${title} (${frequency})`);
+  logActivity(store, "function_created", `Nova rotina fixa: ${title} (${frequency})`, coupleId);
   db.saveStore();
   res.json({ success: true, func: newFunction });
 });
 
 app.post("/api/fixed-functions/toggle-complete", (req, res) => {
   const { id, user_id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.fixedFunctions) store.fixedFunctions = [];
 
@@ -2080,7 +2108,7 @@ app.post("/api/fixed-functions/toggle-complete", (req, res) => {
     if (func.rotation_enabled) {
       const otherUser = func.current_rotation_owner === "Leandro" ? "Kaisa" : "Leandro";
       func.current_rotation_owner = otherUser;
-      logActivity(store, "function_rotated", `${func.title} agora é responsabilidade de ${otherUser}`);
+      logActivity(store, "function_rotated", `${func.title} agora é responsabilidade de ${otherUser}`, coupleId);
     }
   }
 
@@ -2148,11 +2176,12 @@ app.post("/api/monthly-accounts/create", (req, res) => {
     return res.status(400).json({ error: "Name, value and due_day are required" });
   }
 
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.monthlyAccounts) store.monthlyAccounts = [];
 
-  // Check for duplicate
-  const exists = store.monthlyAccounts.some(a => a.name.toLowerCase() === name.toLowerCase());
+  // Check for duplicate scoped to this couple
+  const exists = store.monthlyAccounts.some(a => (a as any).coupleId === coupleId && a.name.toLowerCase() === name.toLowerCase());
   if (exists) {
     return res.json({ warning: "Conta já existe" });
   }
@@ -2169,13 +2198,14 @@ app.post("/api/monthly-accounts/create", (req, res) => {
   };
 
   store.monthlyAccounts.push(newAccount);
-  logActivity(store, "account_added", `Conta fixa adicionada: ${name} - R$ ${value}`);
+  logActivity(store, "account_added", `Conta fixa adicionada: ${name} - R$ ${value}`, coupleId);
   db.saveStore();
   res.json({ success: true, account: newAccount });
 });
 
 app.post("/api/monthly-accounts/toggle-paid", (req, res) => {
   const { id } = req.body;
+  const { coupleId } = getRequestCredentials(req);
   const store = db.getStore();
   if (!store.monthlyAccounts) store.monthlyAccounts = [];
 
@@ -2191,7 +2221,7 @@ app.post("/api/monthly-accounts/toggle-paid", (req, res) => {
     account.paid_month = currentMonth;
     if (!account.payment_history) account.payment_history = [];
     account.payment_history.push({ month: currentMonth, paid: true });
-    logActivity(store, "account_paid", `Conta "${account.name}" paga!`);
+    logActivity(store, "account_paid", `Conta "${account.name}" paga!`, coupleId);
   }
 
   db.saveStore();
