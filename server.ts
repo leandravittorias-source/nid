@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { db } from "./server/db";
 import { GoogleGenAI } from "@google/genai";
@@ -2244,27 +2245,66 @@ app.post("/api/monthly-accounts/delete", (req, res) => {
 
 async function startServer() {
   try {
-    if (process.env.NODE_ENV !== "production") {
+    const isDev = process.env.NODE_ENV !== "production" && process.env.VITE_DEV !== "false";
+
+    if (isDev) {
       console.log("Starting backend dev server and injecting Vite client-side SPA bundle...");
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: "spa",
-      });
-      app.use(vite.middlewares);
+      try {
+        const vite = await createViteServer({
+          server: { middlewareMode: true },
+          appType: "spa",
+        });
+        app.use(vite.middlewares);
+      } catch (viteErr) {
+        console.warn("⚠️  Vite initialization failed, falling back to static mode");
+        const distPath = path.join(process.cwd(), "dist");
+        if (!fs.existsSync(distPath)) {
+          console.error("❌ dist/ not found. Run 'npm run build' first.");
+          process.exit(1);
+        }
+        app.use(express.static(distPath));
+        app.get("*", (req, res) => {
+          res.sendFile(path.join(distPath, "index.html"));
+        });
+      }
     } else {
       // Serve production static build
       const distPath = path.join(process.cwd(), "dist");
-      console.log(`Serving static files from: ${distPath}`);
-      app.use(express.static(distPath));
+      console.log(`📦 Production mode - Serving static files from: ${distPath}`);
+
+      // Verify dist exists
+      if (!fs.existsSync(distPath)) {
+        console.error("❌ dist/ directory not found. Please run 'npm run build' first.");
+        process.exit(1);
+      }
+
+      app.use(express.static(distPath, { maxAge: "1h" }));
       app.get("*", (req, res) => {
-        res.sendFile(path.join(distPath, "index.html"));
+        const indexPath = path.join(distPath, "index.html");
+        if (!fs.existsSync(indexPath)) {
+          console.error("❌ index.html not found in dist/");
+          res.status(404).json({ error: "Frontend not found" });
+          return;
+        }
+        res.sendFile(indexPath);
       });
     }
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🏡 NósDois Server running successfully on http://0.0.0.0:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🏡 NósDois Server running successfully on http://localhost:${PORT}`);
+      console.log(`📍 Environment: ${isDev ? "development" : "production"}`);
+      console.log(`🔗 http://0.0.0.0:${PORT}`);
     });
+
+    // Handle graceful shutdown
+    process.on("SIGTERM", () => {
+      console.log("SIGTERM received, shutting down gracefully...");
+      server.close(() => {
+        console.log("Server closed");
+        process.exit(0);
+      });
+    });
+
   } catch (err) {
     console.error("❌ Failed to start server:", err);
     process.exit(1);
